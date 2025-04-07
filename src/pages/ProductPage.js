@@ -1,6 +1,6 @@
-// ProductPage.js - Shows details for a specific product
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getProductById } from '../services/api';
 
 const ProductPage = () => {
   const { productId } = useParams();
@@ -10,36 +10,21 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    // Simulated API call to fetch product details
-    setTimeout(() => {
-      // Mock data
-      const mockProduct = {
-        id: productId,
-        name: 'Smartphone X',
-        price: 699.99,
-        description: 'The latest smartphone with cutting-edge features including a high-resolution display, powerful processor, and all-day battery life.',
-        features: [
-          '6.5-inch Super AMOLED display',
-          '128GB storage',
-          '12MP triple camera system',
-          'Water and dust resistant',
-          'Fast charging technology'
-        ],
-        images: [
-          '/images/smartphone-front.jpg',
-          '/images/smartphone-back.jpg',
-          '/images/smartphone-side.jpg'
-        ],
-        inStock: true
-      };
-      
-      setProduct(mockProduct);
-      setLoading(false);
-    }, 500);
+    const fetchProduct = async () => {
+      try {
+        const data = await getProductById(productId);
+        setProduct(data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setLoading(false);
+      }
+    };
+    
+    fetchProduct();
   }, [productId]);
 
   const handleAddToCart = () => {
-    // Add to cart logic would go here
     navigate(`/cart/add-confirmation?product=${productId}&quantity=${quantity}`);
   };
 
@@ -47,28 +32,20 @@ const ProductPage = () => {
     return <div className="loading">Loading product details...</div>;
   }
 
+  if (!product) {
+    return <div className="loading">Product not found</div>;
+  }
+
   return (
     <div className="product-page">
       <div className="product-gallery">
-        <img src={product.images[0]} alt={product.name} className="main-image" />
-        <div className="thumbnail-images">
-          {product.images.map((image, index) => (
-            <img key={index} src={image} alt={`${product.name} view ${index + 1}`} />
-          ))}
-        </div>
+        <img src={product.image_url || '/images/placeholder.jpg'} alt={product.name} className="main-image" />
       </div>
       
       <div className="product-details">
         <h1>{product.name}</h1>
-        <p className="price">${product.price.toFixed(2)}</p>
+        <p className="price">${parseFloat(product.price).toFixed(2)}</p>
         <p className="description">{product.description}</p>
-        
-        <h3>Features</h3>
-        <ul className="features-list">
-          {product.features.map((feature, index) => (
-            <li key={index}>{feature}</li>
-          ))}
-        </ul>
         
         <div className="purchase-options">
           <div className="quantity-selector">
@@ -87,9 +64,9 @@ const ProductPage = () => {
           <button 
             onClick={handleAddToCart} 
             className="add-to-cart-button"
-            disabled={!product.inStock}
+            disabled={product.stock_quantity <= 0}
           >
-            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+            {product.stock_quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>

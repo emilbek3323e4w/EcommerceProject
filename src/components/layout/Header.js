@@ -17,8 +17,7 @@ const Header = () => {
     <header>
       <div className="store-home">
         <Link to="/">
-          <img src="/logo.svg" alt="Store Logo" />
-          <span>STORE HOME</span>
+          <img src="/images/amazon-logo.png" alt="." />
         </Link>
       </div>
       

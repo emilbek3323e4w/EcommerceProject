@@ -1,22 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getCategories, getProducts } from '../services/api';
 
 const HomePage = () => {
-  // Featured categories
-  const featuredCategories = [
-    { id: 1, name: 'Electronics', image: 'https://via.placeholder.com/300x200' },
-    { id: 2, name: 'Clothing', image: 'https://via.placeholder.com/300x200' },
-    { id: 3, name: 'Home & Kitchen', image: 'https://via.placeholder.com/300x200' },
-    { id: 4, name: 'Books', image: 'https://via.placeholder.com/300x200' }
-  ];
-  
-  // Featured products
-  const featuredProducts = [
-    { id: 101, name: 'Smartphone X', price: 699.99, image: 'https://via.placeholder.com/300x300' },
-    { id: 102, name: 'Laptop Pro', price: 1299.99, image: 'https://via.placeholder.com/300x300' },
-    { id: 103, name: 'Wireless Headphones', price: 159.99, image: 'https://via.placeholder.com/300x300' },
-    { id: 104, name: 'Smart Watch', price: 249.99, image: 'https://via.placeholder.com/300x300' },
-  ];
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesData, productsData] = await Promise.all([
+          getCategories(),
+          getProducts()
+        ]);
+        
+        setCategories(categoriesData.slice(0, 4)); // Get first 4 categories
+        setProducts(productsData.slice(0, 4)); // Get first 4 products
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div className="home-page">
@@ -29,9 +42,9 @@ const HomePage = () => {
       <section>
         <h2>Featured Categories</h2>
         <div className="categories-grid">
-          {featuredCategories.map(category => (
-            <Link to={`/category/${category.id}`} key={category.id} className="category-card">
-              <img src={category.image} alt={category.name} />
+          {categories.map(category => (
+            <Link to={`/category/${category.category_id}`} key={category.category_id} className="category-card">
+              <img src={category.image_url || '/images/placeholder.jpg'} alt={category.name} />
               <h2>{category.name}</h2>
             </Link>
           ))}
@@ -41,17 +54,16 @@ const HomePage = () => {
       <section style={{ marginTop: '40px' }}>
         <h2>Featured Products</h2>
         <div className="products-grid">
-          {featuredProducts.map(product => (
-            <div key={product.id} className="product-card">
-              <Link to={`/product/${product.id}`}>
-                <img src={product.image} alt={product.name} />
+          {products.map(product => (
+            <div key={product.product_id} className="product-card">
+              <Link to={`/product/${product.product_id}`}>
+                <img src={product.image_url || '/images/placeholder.jpg'} alt={product.name} />
                 <h3>{product.name}</h3>
-                <p className="price">${product.price.toFixed(2)}</p>
+                <p className="price">${parseFloat(product.price).toFixed(2)}</p>
               </Link>
               <button 
                 onClick={() => {
-                  // Add to cart logic would go here
-                  window.location.href = `/cart/add-confirmation?product=${product.id}`;
+                  window.location.href = `/cart/add-confirmation?product=${product.product_id}`;
                 }}
                 className="add-to-cart-button"
               >

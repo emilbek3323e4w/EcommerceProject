@@ -8,6 +8,12 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
 // Import page components
+import HomePage from './pages/HomePage';
+import CategoryOverview from './pages/CategoryOverview';
+import CategoryPage from './pages/CategoryPage';
+import ProductPage from './pages/ProductPage';
+import Cart from './pages/Cart';
+import AddToCartConfirmation from './pages/AddToCartConfirmation';
 import StoreLocator from './pages/StoreLocator';
 import StoreDetails from './pages/StoreDetails';
 
@@ -20,14 +26,8 @@ const PlaceholderPage = ({ title }) => (
   </div>
 );
 
-// Define placeholder components for each route
-const HomePage = () => <PlaceholderPage title="Home Page" />;
-const CategoryOverview = () => <PlaceholderPage title="Category Overview" />;
-const CategoryPage = () => <PlaceholderPage title="Category Page" />;
-const ProductPage = () => <PlaceholderPage title="Product Page" />;
+// Define placeholder components for incomplete routes
 const SearchResults = () => <PlaceholderPage title="Search Results" />;
-const Cart = () => <PlaceholderPage title="Shopping Cart" />;
-const AddToCartConfirmation = () => <PlaceholderPage title="Added to Cart" />;
 const Login = () => <PlaceholderPage title="Login" />;
 const CreateAccount = () => <PlaceholderPage title="Create Account" />;
 const Account = () => <PlaceholderPage title="My Account" />;
